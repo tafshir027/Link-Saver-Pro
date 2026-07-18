@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Link Saver Pro | Premium Bookmark Manager</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-primary: #0a0f1e;
+      --bg-secondary: #111827;
+      --bg-card: rgba(15, 23, 42, 0.6);
+      --glass-bg: rgba(255, 255, 255, 0.03);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --glass-hover: rgba(255, 255, 255, 0.06);
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+      --gradient-success: linear-gradient(135deg, #059669 0%, #10b981 100%);
+      --gradient-warning: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+      --gradient-danger: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.5);
+      --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.6);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg-primary);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      overflow-x: hidden;
+      padding: 0;
+    }
+
+    /* Animated background orbs */
+    .bg-orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.3;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .bg-orb.orb-1 {
+      width: 500px;
+      height: 500px;
+      background: #6366f1;
+      top: -150px;
+      left: -150px;
+      animation: float1 20s infinite ease-in-out;
+    }
+    .bg-orb.orb-2 {
+      width: 400px;
+      height: 400px;
+      background: #8b5cf6;
+      bottom: -100px;
+      right: -100px;
+      animation: float2 25s infinite ease-in-out;
+    }
+    .bg-orb.orb-3 {
+      width: 350px;
+      height: 350px;
+      background: #a855f7;
+      top: 50%;
+      left: 50%;
+      animation: float3 22s infinite ease-in-out;
+    }
+
+    @keyframes float1 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(100px, 80px) scale(1.1); }
+      66% { transform: translate(-50px, 120px) scale(0.9); }
+    }
+    @keyframes float2 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(-80px, -60px) scale(1.15); }
+      66% { transform: translate(60px, -100px) scale(0.85); }
+    }
+    @keyframes float3 {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); }
+      50% { transform: translate(-50%, -50%) scale(1.2); }
+    }
+
+    /* Grid pattern overlay */
+    .grid-pattern {
+      position: fixed;
+      inset: 0;
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 1200px;
+      padding: 2rem 1.5rem 4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* Premium Glass Card */
+    .glass-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-xl);
+      padding: 2rem;
+      box-shadow: var(--shadow-lg);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    .glass-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    }
+    .glass-card:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+      box-shadow: var(--shadow-xl);
+      transform: translateY(-2px);
+    }
+
+    h1, h2, h3 {
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    /* Header Styles */
+    .header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+    }
+    .app-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .app-title i {
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-size: 2rem;
+    }
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      margin-top: 0.3rem;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+    }
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      color: #a5b4fc;
+      margin-left: 0.5rem;
+      font-weight: 500;
+    }
+
+    /* Sync Status */
+    .sync-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 0.6rem 1.2rem;
+      border-radius: 40px;
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #64748b;
+      box-shadow: 0 0 8px currentColor;
+    }
+    .status-dot.synced { 
+      background: #10b981; 
+      box-shadow: 0 0 12px #10b981;
+    }
+    .status-dot.syncing { 
+      background: #f59e0b; 
+      animation: pulse 1s infinite;
+      box-shadow: 0 0 12px #f59e0b;
+    }
+    .status-dot.error { 
+      background: #ef4444; 
+      box-shadow: 0 0 12px #ef4444;
+    }
+    .status-dot.local { 
+      background: #94a3b8; 
+    }
+
+    @keyframes pulse { 
+      0%, 100% { opacity: 1; transform: scale(1); } 
+      50% { opacity: 0.5; transform: scale(1.2); } 
+    }
+
+    /* Buttons */
+    .btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #e2e8f0;
+      padding: 0.65rem 1.3rem;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(20px);
+      white-space: nowrap;
+      letter-spacing: 0.01em;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, transparent, rgba(255,255,255,0.05), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .btn:hover::after {
+      opacity: 1;
+    }
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+    .btn:active {
+      transform: translateY(0);
+    }
+    .btn-primary {
+      background: var(--gradient-primary);
+      border: none;
+      color: white;
+      font-weight: 700;
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+    }
+    .btn-primary:hover {
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+      background: linear-gradient(135deg, #5558e6 0%, #7c3aed 50%, #9333ea 100%);
+    }
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .btn-icon {
+      width: 38px;
+      height: 38px;
+      padding: 0;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Form Styles */
+    .add-link-form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: flex-end;
+    }
+    .input-group {
+      flex: 2;
+      min-width: 200px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .input-group label {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-left: 0.3rem;
+    }
+    input, textarea {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1.5px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-md);
+      padding: 0.85rem 1.1rem;
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      outline: none;
+      transition: all 0.3s;
+      width: 100%;
+      font-family: 'Inter', sans-serif;
+    }
+    input:focus, textarea:focus {
+      border-color: #8b5cf6;
+      box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15);
+      background: rgba(0, 0, 0, 0.6);
+    }
+    input::placeholder {
+      color: var(--text-muted);
+    }
+
+    /* Table Styles */
+    .table-wrapper {
+      overflow-x: auto;
+      border-radius: var(--radius-lg);
+    }
+    .link-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 600px;
+    }
+    .link-table thead th {
+      text-align: left;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 1rem 1.2rem;
+      background: rgba(0, 0, 0, 0.3);
+      border-bottom: 2px solid rgba(255, 255, 255, 0.08);
+    }
+    .link-table tbody td {
+      padding: 1.1rem 1.2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      vertical-align: middle;
+      transition: background 0.2s;
+    }
+    .link-table tbody tr {
+      transition: all 0.2s;
+    }
+    .link-table tbody tr:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
+    .link-name {
+      font-weight: 700;
+      color: #f8fafc;
+      font-size: 0.95rem;
+    }
+    .link-name i {
+      color: #8b5cf6;
+      margin-right: 0.5rem;
+      font-size: 0.8rem;
+    }
+    .link-url {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      word-break: break-all;
+      max-width: 350px;
+      display: inline-block;
+    }
+    .link-url:hover {
+      color: #a5b4fc;
+    }
+    .actions {
+      display: flex;
+      gap: 0.4rem;
+      justify-content: flex-end;
+    }
+    .action-btn {
+      width: 36px;
+      height: 36px;
+      border: none;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-secondary);
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      border: 1px solid transparent;
+    }
+    .action-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: scale(1.1);
+    }
+    .action-btn.copy-btn:hover {
+      color: #10b981;
+      border-color: rgba(16, 185, 129, 0.3);
+      background: rgba(16, 185, 129, 0.1);
+    }
+    .action-btn.edit-btn:hover {
+      color: #f59e0b;
+      border-color: rgba(245, 158, 11, 0.3);
+      background: rgba(245, 158, 11, 0.1);
+    }
+    .action-btn.delete-btn:hover {
+      color: #ef4444;
+      border-color: rgba(239, 68, 68, 0.3);
+      background: rgba(239, 68, 68, 0.1);
+    }
+    .url-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: rgba(255,255,255,0.03);
+      padding: 0.2rem 0.6rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+    }
+    .empty-state-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      opacity: 0.3;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .empty-state h3 {
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+    }
+    .empty-state p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(8px);
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 1rem;
+    }
+    .modal.active {
+      display: flex;
+    }
+    .modal-content {
+      background: var(--bg-secondary);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius-xl);
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 480px;
+      position: relative;
+      box-shadow: var(--shadow-xl);
+      animation: modalSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    @keyframes modalSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    .modal-close {
+      position: absolute;
+      top: 1.2rem;
+      right: 1.2rem;
+      background: rgba(255,255,255,0.05);
+      border: none;
+      color: var(--text-secondary);
+      font-size: 1.2rem;
+      cursor: pointer;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .modal-close:hover {
+      background: rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+    }
+    .modal h2, .modal h3 {
+      margin-bottom: 1.5rem;
+      font-size: 1.5rem;
+    }
+    .modal .input-row {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .modal .btn-row {
+      display: flex;
+      gap: 1rem;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+
+    /* Toast Notifications */
+    .toast-container {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+    .toast {
+      background: var(--bg-secondary);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-xl);
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      min-width: 280px;
+      animation: toastSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.3s;
+    }
+    .toast.success { border-left: 4px solid #10b981; }
+    .toast.error { border-left: 4px solid #ef4444; }
+    .toast.info { border-left: 4px solid #6366f1; }
+    .toast i { font-size: 1.2rem; }
+    .toast.success i { color: #10b981; }
+    .toast.error i { color: #ef4444; }
+    .toast.info i { color: #6366f1; }
+    @keyframes toastSlideIn {
+      from { opacity: 0; transform: translateX(100px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    /* Stats Bar */
+    .stats-bar {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+    .stat-item i {
+      color: #8b5cf6;
+    }
+    .stat-value {
+      color: var(--text-primary);
+      font-weight: 700;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container {
+        padding: 1rem;
+        gap: 1rem;
+      }
+      .glass-card {
+        padding: 1.2rem;
+      }
+      .app-title {
+        font-size: 1.8rem;
+      }
+      .add-link-form {
+        flex-direction: column;
+      }
+      .btn {
+        padding: 0.55rem 1rem;
+        font-size: 0.85rem;
+      }
+      .link-table thead {
+        display: none;
+      }
+      .link-table tbody td {
+        display: block;
+        text-align: right;
+        padding: 0.8rem;
+      }
+      .link-table tbody td::before {
+        content: attr(data-label);
+        float: left;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        font-size: 0.7rem;
+      }
+      .actions {
+        justify-content: flex-end;
+        margin-top: 0.5rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .sync-row {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Background Orbs -->
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-orb orb-3"></div>
+  <div class="grid-pattern"></div>
+
+  <div class="container">
+    <!-- Header Card -->
+    <div class="glass-card">
+      <div class="header">
+        <div>
+          <h1 class="app-title">
+            <i class="fa-solid fa-link"></i> Link Saver Pro
+            <span class="header-badge"><i class="fa-solid fa-crown"></i> PRO</span>
+          </h1>
+          <div class="subtitle">
+            <i class="fa-solid fa-cloud-arrow-up"></i> Smart bookmark manager with GitHub sync
+          </div>
+        </div>
+        <div class="sync-row">
+          <div class="status-badge" id="syncStatus">
+            <span class="status-dot" id="syncDot"></span>
+            <span id="syncText">Loading...</span>
+          </div>
+          <button class="btn btn-ghost" id="changeGhBtn">
+            <i class="fa-solid fa-gear"></i> Settings
+          </button>
+        </div>
+      </div>
+      
+      <!-- Stats Bar -->
+      <div class="stats-bar" style="margin-top: 1.2rem; padding-top: 1.2rem; border-top: 1px solid rgba(255,255,255,0.05);">
+        <div class="stat-item">
+          <i class="fa-solid fa-bookmark"></i>
+          <span>Total Links: <span class="stat-value" id="totalLinks">0</span></span>
+        </div>
+        <div class="stat-item">
+          <i class="fa-solid fa-cloud"></i>
+          <span>Sync: <span class="stat-value" id="syncMode">Local</span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Link Card -->
+    <div class="glass-card">
+      <h3 style="margin-bottom: 1.2rem; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="fa-solid fa-plus-circle" style="color: #8b5cf6;"></i> Add New Link
+      </h3>
+      <div class="add-link-form">
+        <div class="input-group">
+          <label><i class="fa-solid fa-tag"></i> Page Name</label>
+          <input type="text" id="pageNameInput" placeholder="e.g., My Awesome Website" autocomplete="off">
+        </div>
+        <div class="input-group">
+          <label><i class="fa-solid fa-globe"></i> URL</label>
+          <input type="url" id="pageUrlInput" placeholder="https://example.com" autocomplete="off">
+        </div>
+        <button class="btn btn-primary" id="addLinkBtn">
+          <i class="fa-solid fa-save"></i> Save Link
+        </button>
+      </div>
+    </div>
+
+    <!-- Links Table Card -->
+    <div class="glass-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h3 style="font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fa-solid fa-list-ul" style="color: #8b5cf6;"></i> Your Links
+        </h3>
+        <span style="font-size: 0.8rem; color: var(--text-muted);" id="linkCount">0 links</span>
+      </div>
+      <div class="table-wrapper">
+        <div id="tableContainer">
+          <!-- dynamic content -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Setup Modal -->
+  <div class="modal" id="setupModal">
+    <div class="modal-content">
+      <button class="modal-close" id="closeSetupModalBtn"><i class="fa-solid fa-times"></i></button>
+      <h2><i class="fa-brands fa-github"></i> GitHub Sync Setup</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.9rem;">
+        Connect to GitHub to sync your links across devices.
+      </p>
+      <div class="input-row">
+        <input type="text" id="ghOwner" placeholder="GitHub Username" autocomplete="off">
+        <input type="text" id="ghRepo" placeholder="Repository Name" autocomplete="off">
+        <input type="password" id="ghToken" placeholder="Personal Access Token (repo scope)" autocomplete="off">
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" id="useLocalOnlyBtn">
+          <i class="fa-solid fa-hard-drive"></i> Use Local Only
+        </button>
+        <button class="btn btn-primary" id="saveGhBtn">
+          <i class="fa-solid fa-plug"></i> Connect & Validate
+        </button>
+      </div>
+      <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 1rem; text-align: center;">
+        <i class="fa-solid fa-lock"></i> Token requires <strong>repo</strong> scope. Stored locally only.
+      </p>
+    </div>
+  </div>
+
+  <!-- Edit Modal -->
+  <div class="modal" id="editModal">
+    <div class="modal-content">
+      <button class="modal-close" id="closeEditModalBtn"><i class="fa-solid fa-times"></i></button>
+      <h3><i class="fa-solid fa-pen-to-square"></i> Edit Link</h3>
+      <input type="hidden" id="editId">
+      <div class="input-row">
+        <input type="text" id="editName" placeholder="Page Name">
+        <input type="url" id="editUrl" placeholder="URL">
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" id="cancelEditBtn">Cancel</button>
+        <button class="btn btn-primary" id="saveEditBtn">
+          <i class="fa-solid fa-check"></i> Update
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+    (function() {
+      // ----- UNIQUE STORAGE KEYS -----
+      const STORAGE_KEY = 'linkSaverProDataV1';
+      const GH_CONFIG_KEY = 'linkSaverProGH';
+      const LOCAL_ONLY_KEY = 'linkSaverProLocalOnly';
+      const GH_FILE = 'linksaver-pro.json';
+
+      // ----- App State -----
+      let appData = [];
+      let GH = { owner: '', repo: '', token: '' };
+      let ghSha = null;
+      let saveQueue = Promise.resolve();
+      let isGitHubReady = false;
+
+      // ----- DOM Elements -----
+      const tableContainer = document.getElementById('tableContainer');
+      const pageNameInput = document.getElementById('pageNameInput');
+      const pageUrlInput = document.getElementById('pageUrlInput');
+      const addLinkBtn = document.getElementById('addLinkBtn');
+      const setupModal = document.getElementById('setupModal');
+      const editModal = document.getElementById('editModal');
+      const ghOwnerInput = document.getElementById('ghOwner');
+      const ghRepoInput = document.getElementById('ghRepo');
+      const ghTokenInput = document.getElementById('ghToken');
+      const saveGhBtn = document.getElementById('saveGhBtn');
+      const useLocalOnlyBtn = document.getElementById('useLocalOnlyBtn');
+      const changeGhBtn = document.getElementById('changeGhBtn');
+      const syncDot = document.getElementById('syncDot');
+      const syncText = document.getElementById('syncText');
+      const editName = document.getElementById('editName');
+      const editUrl = document.getElementById('editUrl');
+      const editId = document.getElementById('editId');
+      const saveEditBtn = document.getElementById('saveEditBtn');
+      const cancelEditBtn = document.getElementById('cancelEditBtn');
+      const closeSetupModalBtn = document.getElementById('closeSetupModalBtn');
+      const closeEditModalBtn = document.getElementById('closeEditModalBtn');
+      const toastContainer = document.getElementById('toastContainer');
+      const totalLinksEl = document.getElementById('totalLinks');
+      const syncModeEl = document.getElementById('syncMode');
+      const linkCountEl = document.getElementById('linkCount');
+
+      // ----- Utility: HTML escape -----
+      function escapeHtml(str) {
+        return String(str).replace(/[&<>"']/g, function(m) {
+          if (m === '&') return '&amp;';
+          if (m === '<') return '&lt;';
+          if (m === '>') return '&gt;';
+          if (m === '"') return '&quot;';
+          return '&#039;';
+        });
+      }
+
+      // ----- Toast System -----
+      function showToast(message, type = 'info') {
+        const icons = { success: 'fa-circle-check', error: 'fa-circle-exclamation', info: 'fa-circle-info' };
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `<i class="fa-solid ${icons[type]}"></i> ${message}`;
+        toastContainer.appendChild(toast);
+        
+        setTimeout(() => {
+          toast.style.opacity = '0';
+          toast.style.transform = 'translateX(100px)';
+          setTimeout(() => toast.remove(), 300);
+        }, 3000);
+      }
+
+      // ----- Modal Helpers -----
+      function openSetupModal() {
+        setupModal.classList.add('active');
+        if (GH.owner) ghOwnerInput.value = GH.owner;
+        if (GH.repo) ghRepoInput.value = GH.repo;
+        if (GH.token) ghTokenInput.value = GH.token;
+      }
+      function closeSetupModal() { setupModal.classList.remove('active'); }
+      function openEditModal(id, name, url) {
+        editId.value = id;
+        editName.value = name;
+        editUrl.value = url;
+        editModal.classList.add('active');
+      }
+      function closeEditModal() { editModal.classList.remove('active'); }
+
+      // ----- Sync Status -----
+      function setSyncStatus(status, text) {
+        syncDot.className = `status-dot ${status}`;
+        syncText.textContent = text || status;
+        syncModeEl.textContent = isGitHubReady ? 'GitHub' : 'Local';
+      }
+
+      function updateStats() {
+        totalLinksEl.textContent = appData.length;
+        linkCountEl.textContent = `${appData.length} link${appData.length !== 1 ? 's' : ''}`;
+      }
+
+      // ----- GitHub API (EXACT implementation) -----
+      function ghHead(cfg = GH) {
+        return {
+          'Authorization': `token ${cfg.token}`,
+          'Accept': 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json',
+          'X-GitHub-Api-Version': '2022-11-28'
+        };
+      }
+
+      function toB64(s) {
+        const b = new TextEncoder().encode(s);
+        let r = '';
+        b.forEach(x => r += String.fromCharCode(x));
+        return btoa(r);
+      }
+
+      function fromB64(b) {
+        try {
+          const cleaned = b.replace(/\s/g, '');
+          const binary = atob(cleaned);
+          const bytes = new Uint8Array(binary.length);
+          for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+          return new TextDecoder().decode(bytes);
+        } catch (e) {
+          console.error('Base64 decode error:', e);
+          try {
+            const binary = atob(b.replace(/\s/g, ''));
+            const bytes = [];
+            for (let i = 0; i < binary.length; i++) bytes.push(binary.charCodeAt(i));
+            return new TextDecoder().decode(new Uint8Array(bytes));
+          } catch (e2) {
+            console.error('Fallback decode also failed:', e2);
+            throw new Error('Failed to decode data from GitHub');
+          }
+        }
+      }
+
+      async function ghLoad() {
+        try {
+          const r = await fetch(
+            `https://api.github.com/repos/${GH.owner}/${GH.repo}/contents/${GH_FILE}`,
+            { headers: ghHead() }
+          );
+          if (r.status === 404) { ghSha = null; return null; }
+          if (!r.ok) {
+            const e = await r.json().catch(() => ({}));
+            throw new Error(e.message || `GitHub returned HTTP ${r.status}`);
+          }
+          const d = await r.json();
+          ghSha = d.sha;
+          const decoded = fromB64(d.content);
+          return JSON.parse(decoded);
+        } catch (e) { throw e; }
+      }
+
+      async function ghSave(data) {
+        try {
+          const body = {
+            message: 'LinkSaverPro update',
+            content: toB64(JSON.stringify(data, null, 2))
+          };
+          if (ghSha) body.sha = ghSha;
+
+          const r = await fetch(
+            `https://api.github.com/repos/${GH.owner}/${GH.repo}/contents/${GH_FILE}`,
+            { method: 'PUT', headers: ghHead(), body: JSON.stringify(body) }
+          );
+
+          if (r.status === 409) {
+            await ghLoad();
+            const body2 = {
+              message: 'LinkSaverPro update (merge)',
+              content: toB64(JSON.stringify(data, null, 2)),
+              sha: ghSha
+            };
+            const r2 = await fetch(
+              `https://api.github.com/repos/${GH.owner}/${GH.repo}/contents/${GH_FILE}`,
+              { method: 'PUT', headers: ghHead(), body: JSON.stringify(body2) }
+            );
+            if (!r2.ok) {
+              const e = await r2.json().catch(() => ({}));
+              throw new Error(e.message || `HTTP ${r2.status}`);
+            }
+            const d2 = await r2.json();
+            ghSha = d2.content.sha;
+            return;
+          }
+
+          if (!r.ok) {
+            const e = await r.json().catch(() => ({}));
+            throw new Error(e.message || `HTTP ${r.status}`);
+          }
+          const d = await r.json();
+          ghSha = d.content.sha;
+        } catch (e) { throw e; }
+      }
+
+      function persist() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+        updateStats();
+        if (!isGitHubReady || !GH.owner || !GH.token) return Promise.resolve();
+
+        saveQueue = saveQueue.then(async () => {
+          setSyncStatus('syncing', 'Saving...');
+          try {
+            await ghSave(JSON.parse(JSON.stringify(appData)));
+            setSyncStatus('synced', 'Synced');
+            setTimeout(() => setSyncStatus('synced', 'Synced'), 2000);
+          } catch (e) {
+            setSyncStatus('error', 'Save failed');
+            showToast('Sync failed: ' + e.message, 'error');
+          }
+        });
+        return saveQueue;
+      }
+
+      // ----- Render Table -----
+      function renderTable() {
+        if (!appData.length) {
+          tableContainer.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-state-icon"><i class="fa-solid fa-book-open"></i></div>
+              <h3>No Links Yet</h3>
+              <p>Start building your collection. Add your first link above!</p>
+            </div>`;
+        } else {
+          let html = `
+            <table class="link-table">
+              <thead>
+                <tr>
+                  <th>Page Name</th>
+                  <th>URL</th>
+                  <th style="text-align:right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody>`;
+          appData.forEach((link) => {
+            html += `
+              <tr>
+                <td data-label="Name">
+                  <span class="link-name">
+                    <i class="fa-solid fa-link"></i> ${escapeHtml(link.name)}
+                  </span>
+                </td>
+                <td data-label="URL">
+                  <span class="link-url" title="${escapeHtml(link.url)}">
+                    <span class="url-badge"><i class="fa-solid fa-globe"></i> ${escapeHtml(link.url.length > 40 ? link.url.substring(0, 40) + '...' : link.url)}</span>
+                  </span>
+                </td>
+                <td data-label="Actions">
+                  <div class="actions">
+                    <button class="action-btn copy-btn" data-url="${escapeHtml(link.url)}" title="Copy URL">
+                      <i class="fa-solid fa-copy"></i>
+                    </button>
+                    <button class="action-btn edit-btn" data-id="${link.id}" data-name="${escapeHtml(link.name)}" data-url="${escapeHtml(link.url)}" title="Edit">
+                      <i class="fa-solid fa-pen-to-square"></i>
+                    </button>
+                    <button class="action-btn delete-btn" data-id="${link.id}" title="Delete">
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>`;
+          });
+          html += '</tbody></table>';
+          tableContainer.innerHTML = html;
+
+          // Attach events
+          document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              const url = btn.getAttribute('data-url');
+              navigator.clipboard.writeText(url).then(() => showToast('URL copied to clipboard!', 'success'));
+            });
+          });
+          document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              const id = btn.getAttribute('data-id');
+              const name = btn.getAttribute('data-name');
+              const url = btn.getAttribute('data-url');
+              openEditModal(id, name, url);
+            });
+          });
+          document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              const id = btn.getAttribute('data-id');
+              if (confirm('Are you sure you want to delete this link?')) {
+                appData = appData.filter(l => l.id != id);
+                persist().then(() => renderTable());
+                showToast('Link deleted successfully', 'info');
+              }
+            });
+          });
+        }
+        updateStats();
+      }
+
+      // Add new link
+      function addLink() {
+        const name = pageNameInput.value.trim();
+        let url = pageUrlInput.value.trim();
+        if (!name || !url) {
+          showToast('Please fill in both name and URL', 'error');
+          return;
+        }
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+          url = 'https://' + url;
+        }
+        const newLink = { id: Date.now(), name, url };
+        appData.push(newLink);
+        pageNameInput.value = '';
+        pageUrlInput.value = '';
+        persist().then(() => renderTable());
+        showToast('Link saved successfully! 🎉', 'success');
+        pageNameInput.focus();
+      }
+
+      // ----- GitHub Config -----
+      function loadGitHubConfig() {
+        const saved = localStorage.getItem(GH_CONFIG_KEY);
+        if (saved) {
+          try { GH = JSON.parse(saved); } catch(e) { GH = { owner: '', repo: '', token: '' }; }
+        }
+        const localOnly = localStorage.getItem(LOCAL_ONLY_KEY) === 'true';
+        
+        if (localOnly) {
+          isGitHubReady = false;
+          setSyncStatus('local', 'Local Only');
+        } else if (GH.owner && GH.token) {
+          isGitHubReady = true;
+          setSyncStatus('syncing', 'Connecting...');
+          ghLoad().then(remoteData => {
+            if (remoteData && Array.isArray(remoteData)) {
+              appData = remoteData;
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+              renderTable();
+            }
+            setSyncStatus('synced', 'Connected');
+          }).catch(() => {
+            setSyncStatus('error', 'Offline');
+          });
+        } else {
+          isGitHubReady = false;
+          setSyncStatus('local', 'Not configured');
+          setTimeout(() => openSetupModal(), 800);
+        }
+        updateStats();
+      }
+
+      function saveGitHubConfig(owner, repo, token) {
+        GH = { owner, repo, token };
+        localStorage.setItem(GH_CONFIG_KEY, JSON.stringify(GH));
+        localStorage.setItem(LOCAL_ONLY_KEY, 'false');
+        isGitHubReady = true;
+        setSyncStatus('syncing', 'Validating...');
+        
+        ghLoad().then(remote => {
+          if (remote && Array.isArray(remote)) {
+            appData = remote;
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+          } else {
+            persist();
+          }
+          setSyncStatus('synced', 'Connected');
+          renderTable();
+          closeSetupModal();
+          showToast('GitHub connected successfully! 🚀', 'success');
+        }).catch(err => {
+          setSyncStatus('error', 'Auth failed');
+          showToast('Connection failed: ' + err.message, 'error');
+        });
+      }
+
+      function useLocalOnly() {
+        localStorage.setItem(LOCAL_ONLY_KEY, 'true');
+        GH = { owner: '', repo: '', token: '' };
+        localStorage.removeItem(GH_CONFIG_KEY);
+        isGitHubReady = false;
+        ghSha = null;
+        setSyncStatus('local', 'Local Only');
+        closeSetupModal();
+        showToast('Switched to Local Only mode', 'info');
+        renderTable();
+      }
+
+      // ----- Event Listeners -----
+      addLinkBtn.addEventListener('click', addLink);
+      pageUrlInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') addLink(); });
+      pageNameInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') pageUrlInput.focus(); });
+
+      changeGhBtn.addEventListener('click', openSetupModal);
+      saveGhBtn.addEventListener('click', () => {
+        const owner = ghOwnerInput.value.trim();
+        const repo = ghRepoInput.value.trim();
+        const token = ghTokenInput.value.trim();
+        if (!owner || !repo || !token) {
+          showToast('Please fill all fields', 'error');
+          return;
+        }
+        saveGitHubConfig(owner, repo, token);
+      });
+
+      useLocalOnlyBtn.addEventListener('click', useLocalOnly);
+      closeSetupModalBtn.addEventListener('click', closeSetupModal);
+      setupModal.addEventListener('click', (e) => { if (e.target === setupModal) closeSetupModal(); });
+
+      saveEditBtn.addEventListener('click', () => {
+        const id = editId.value;
+        const name = editName.value.trim();
+        let url = editUrl.value.trim();
+        if (!name || !url) {
+          showToast('Name and URL required', 'error');
+          return;
+        }
+        if (!url.startsWith('http://') && !url.startsWith('https://')) url = 'https://' + url;
+        const link = appData.find(l => l.id == id);
+        if (link) {
+          link.name = name;
+          link.url = url;
+          persist().then(() => renderTable());
+          showToast('Link updated! ✅', 'success');
+        }
+        closeEditModal();
+      });
+
+      cancelEditBtn.addEventListener('click', closeEditModal);
+      closeEditModalBtn.addEventListener('click', closeEditModal);
+      editModal.addEventListener('click', (e) => { if (e.target === editModal) closeEditModal(); });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          if (setupModal.classList.contains('active')) closeSetupModal();
+          if (editModal.classList.contains('active')) closeEditModal();
+        }
+      });
+
+      // Initial load
+      const storedData = localStorage.getItem(STORAGE_KEY);
+      if (storedData) {
+        try { appData = JSON.parse(storedData); } catch(e) { appData = []; }
+      }
+      loadGitHubConfig();
+      renderTable();
+    })();
+  </script>
+</body>
+</html>
